@@ -3,13 +3,22 @@
 import csv
 from collections import defaultdict
 from dataclasses import dataclass, field, fields
+from enum import Enum
 from time import mktime, strptime
 
 import rich
 from rich.box import ROUNDED
-from rich.table import Table
+from rich.table import Column, Table
 
 __all__ = ["Fidelity"]
+
+
+class Style(Enum):
+    """Styles for different table items."""
+
+    TABLE = "#d06b64 italic"
+    HEADER = "#92e1c0 italic"
+    DETAIL = "#9a9cff"
 
 
 @dataclass
@@ -67,17 +76,23 @@ class HistoryRecord:
         )
 
     @staticmethod
-    def get_report_header() -> list[str]:
+    def get_report_table(title: str) -> Table:
         """Docstring."""
 
-        return [
-            "Run Date",
-            "Action",
-            "Symbol",
-            ">Quantity",
-            ">Price",
-            ">Amount",
-        ]
+        return Table(
+            Column("Run Date"),
+            Column("Action"),
+            Column("Symbol"),
+            Column("Quantity", justify="right"),
+            Column("Price", justify="right"),
+            Column("Amount", justify="right"),
+            title=title,
+            title_style=Style.TABLE.value,
+            box=ROUNDED,
+            style=Style.TABLE.value,
+            header_style=Style.HEADER.value,
+            row_styles=[Style.DETAIL.value],
+        )
 
     def get_report_detail(self) -> list[str]:
         """Docstring."""
@@ -121,10 +136,9 @@ class Fidelity:
         else:
             records = self.records
 
-        table = Table(box=ROUNDED)
-        self.add_header(table, HistoryRecord.get_report_header())
+        table = HistoryRecord.get_report_table("History Report")
 
-        for rec in sorted(records, key=lambda x: x.t_run_date):
+        for rec in sorted(records, key=lambda x: (x.t_run_date, x.symbol)):
             table.add_row(*rec.get_report_detail())
 
         rich.print(table)
@@ -138,8 +152,7 @@ class Fidelity:
         else:
             records = self.records
 
-        table = Table(box=ROUNDED)
-        self.add_header(table, HistoryRecord.get_report_header())
+        table = HistoryRecord.get_report_table("Symbol Report")
 
         last_symbol = None
         for rec in sorted(records, key=lambda x: (x.symbol, x.t_run_date)):
@@ -164,22 +177,19 @@ class Fidelity:
             symbols[rec.symbol]["quantity"] += rec.quantity
             symbols[rec.symbol]["amount"] += rec.amount
 
-        table = Table(box=ROUNDED)
-        self.add_header(table, ["Symbol", ">Quantity", ">Amount"])
+        table = Table(
+            Column("Symbol"),
+            Column("Quantity", justify="right"),
+            Column("Amount", justify="right"),
+            title="Position Report",
+            title_style=Style.TABLE.value,
+            box=ROUNDED,
+            style=Style.TABLE.value,
+            header_style=Style.HEADER.value,
+            row_styles=[Style.DETAIL.value],
+        )
 
         for symbol, data in symbols.items():
             table.add_row(symbol, f"{data['quantity']:,.3f}", f"{data['amount']:,.3f}")
 
         rich.print(table)
-
-    def add_header(self, table: Table, header: list[str]) -> None:
-        """Docstring."""
-
-        for title in header:
-            if title[0] == "^":
-                title, justify = title[1:], "center"
-            elif title[0] == ">":
-                title, justify = title[1:], "right"
-            else:
-                justify = "left"
-            table.add_column(title, justify=justify)  # type: ignore[arg-type]
