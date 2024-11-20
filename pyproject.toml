@@ -1,6 +1,6 @@
 [project]
 name = "rlane-fidelity"
-version = "1.0.2"
+version = "1.0.3"
 description = "Process Fidelity transaction files"
 authors = [
     {name = "Russel Lane", email = "russel@rlane.com"},

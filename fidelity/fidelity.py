@@ -1,6 +1,7 @@
 """Docstring."""
 
 import csv
+from argparse import Namespace
 from collections import defaultdict
 from dataclasses import dataclass, field, fields
 from enum import Enum
@@ -86,6 +87,7 @@ class HistoryRecord:
             Column("Quantity", justify="right"),
             Column("Price", justify="right"),
             Column("Amount", justify="right"),
+            Column("Balance", justify="right"),
             title=title,
             title_style=Style.TABLE.value,
             box=ROUNDED,
@@ -94,23 +96,30 @@ class HistoryRecord:
             row_styles=[Style.DETAIL.value],
         )
 
-    def get_report_detail(self) -> list[str]:
+    def get_report_detail(self, balance: float) -> list[str]:
         """Docstring."""
 
         return [
-            f"{self.run_date}",
-            f"{self.action.lower()}",
-            f"{self.symbol}",
+            self.run_date,
+            self.action.lower(),
+            self.symbol,
             f"{self.quantity:,.3f}",
             f"{self.price:,.3f}",
             f"{self.amount:,.3f}",
+            f"{balance:,.3f}",
         ]
 
 
 class Fidelity:
     """Docstring."""
 
+    options: Namespace
     records: list[HistoryRecord] = []
+
+    def __init__(self, options: Namespace) -> None:
+        """Docstring."""
+
+        self.options = options
 
     def read_input_files(self, files: list[str]) -> None:
         """Docstring."""
@@ -130,36 +139,31 @@ class Fidelity:
     def print_history_report(self) -> None:
         """Print Report."""
 
-        excludes = ["SPAXX"]
-        if excludes:
-            records = [x for x in self.records if x.symbol not in excludes]
-        else:
-            records = self.records
-
         table = HistoryRecord.get_report_table("History Report")
+        records = self._get_history_records()
+        balance = 0.0
 
         for rec in sorted(records, key=lambda x: (x.t_run_date, x.symbol)):
-            table.add_row(*rec.get_report_detail())
+            balance += rec.amount
+            table.add_row(*rec.get_report_detail(balance))
 
         rich.print(table)
 
     def print_symbol_report(self) -> None:
         """Print Report."""
 
-        excludes = ["SPAXX"]
-        if excludes:
-            records = [x for x in self.records if x.symbol not in excludes]
-        else:
-            records = self.records
-
         table = HistoryRecord.get_report_table("Symbol Report")
-
+        records = self._get_history_records()
         last_symbol = None
+        balance = 0.0
+
         for rec in sorted(records, key=lambda x: (x.symbol, x.t_run_date)):
             if last_symbol is not None and last_symbol != rec.symbol:
+                balance = 0.0
                 table.add_section()
             last_symbol = rec.symbol
-            table.add_row(*rec.get_report_detail())
+            balance += rec.amount
+            table.add_row(*rec.get_report_detail(balance))
 
         rich.print(table)
 
@@ -170,17 +174,22 @@ class Fidelity:
             lambda: {  # key=symbol
                 "quantity": 0.0,
                 "amount": 0.0,
+                "balance": 0.0,
             }
         )
 
-        for rec in self.records:
+        balance = 0.0
+        for rec in sorted(self.records, key=lambda x: x.symbol):
             symbols[rec.symbol]["quantity"] += rec.quantity
             symbols[rec.symbol]["amount"] += rec.amount
+            balance += rec.amount
+            symbols[rec.symbol]["balance"] = balance
 
         table = Table(
             Column("Symbol"),
             Column("Quantity", justify="right"),
             Column("Amount", justify="right"),
+            Column("Balance", justify="right"),
             title="Position Report",
             title_style=Style.TABLE.value,
             box=ROUNDED,
@@ -190,6 +199,19 @@ class Fidelity:
         )
 
         for symbol, data in symbols.items():
-            table.add_row(symbol, f"{data['quantity']:,.3f}", f"{data['amount']:,.3f}")
+            table.add_row(
+                symbol,
+                f"{data['quantity']:,.3f}",
+                f"{data['amount']:,.3f}",
+                f"{data['balance']:,.3f}",
+            )
 
         rich.print(table)
+
+    def _get_history_records(self) -> list[HistoryRecord]:
+
+        if self.options.no_exclude:
+            return self.records
+
+        records = [x for x in self.records if x.symbol not in ["SPAXX"]]
+        return records

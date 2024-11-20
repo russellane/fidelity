@@ -1,8 +1,9 @@
 ### fidelity - Process Fidelity transaction files
 
 #### Usage
-    fidelity [--use-datafiles] [-h] [-v] [-V] [--config FILE]
-             [--print-config] [--print-url] [--completion [SHELL]]
+    fidelity [--use-datafiles] [--no-exclude] [-h] [-v] [-V]
+             [--config FILE] [--print-config] [--print-url]
+             [--completion [SHELL]]
              [FILES ...]
     
 Process downloaded Fidelity history files.
@@ -11,6 +12,10 @@ Process downloaded Fidelity history files.
     --use-datafiles     Process the `CSV` files defined under `datafiles` in
                         the config file (default: `False`).
     FILES               The `CSV` file(s) to process.
+
+#### Filtering options
+    --no-exclude        Do not exclude `SPAXX` from reports (default:
+                        `False`).
 
 #### Configuration File
   The configuration file defines these elements:

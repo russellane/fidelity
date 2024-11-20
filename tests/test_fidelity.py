@@ -19,3 +19,7 @@ def test_file_dev_null() -> None:
 
 def test_use_datafiles() -> None:
     run_cli(["--use-datafiles"])
+
+
+def test_use_datafiles_no_exclude() -> None:
+    run_cli(["--use-datafiles", "--no-exclude"])

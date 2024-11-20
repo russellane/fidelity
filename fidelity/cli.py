@@ -49,6 +49,15 @@ class FidelityCLI(BaseCLI):
             help="The `CSV` file(s) to process",
         )
 
+        group = self.parser.add_argument_group("Filtering options")
+
+        arg = group.add_argument(
+            "--no-exclude",
+            action="store_true",
+            help="Do not exclude `SPAXX` from reports",
+        )
+        self.add_default_to_help(arg, self.parser)
+
         group = self.parser.add_argument_group(
             "Configuration File",
             self.dedent(
@@ -65,7 +74,7 @@ class FidelityCLI(BaseCLI):
         """Command line interface entry point (method)."""
 
         # Read all `csv` files on the command line within the date range.
-        fidelity = Fidelity()  # self.config, self.options)
+        fidelity = Fidelity(self.options)
         #
         if self.options.use_datafiles and (datafiles := self.config.get("datafiles")):
             files = glob(str(Path(datafiles).expanduser()))
