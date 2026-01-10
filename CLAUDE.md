@@ -14,7 +14,7 @@ pdm install
 pdm run fidelity [options] [FILES...]
 
 # Run tests
-pdm run pytest
+pdm run pytest tests/
 
 # Run a single test
 pdm run pytest tests/test_cli.py::test_version
