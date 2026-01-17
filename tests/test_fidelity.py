@@ -1,6 +1,6 @@
 import sys
 
-from fidelity.cli import FidelityCLI
+from fidelity.cli import main
 
 
 def run_cli(options: list[str]) -> None:
@@ -10,7 +10,7 @@ def run_cli(options: list[str]) -> None:
     if options:
         sys.argv += options
     print(f"\nRunning {sys.argv!r}", flush=True)
-    FidelityCLI().main()
+    main()
 
 
 def test_file_dev_null() -> None:
