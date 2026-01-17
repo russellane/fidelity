@@ -56,13 +56,13 @@ def _get_report_detail(rec: HistoryRecord, balance: float) -> list[str]:
 
 
 class Fidelity:
-    """Docstring."""
+    """Report generator for Fidelity transaction history."""
 
     options: Namespace
     records: list[HistoryRecord]
 
     def __init__(self, options: Namespace) -> None:
-        """Docstring."""
+        """Initialize with CLI options."""
 
         self.options = options
         self.records = []
@@ -105,7 +105,7 @@ class Fidelity:
         rich.print(table)
 
     def print_position_report(self) -> None:
-        """Print Report."""
+        """Print position summary with totals per symbol."""
 
         symbols: dict[str, dict[str, float]] = defaultdict(
             lambda: {  # key=symbol
@@ -146,6 +146,7 @@ class Fidelity:
         rich.print(table)
 
     def _get_history_records(self) -> list[HistoryRecord]:
+        """Return records, optionally filtering out SPAXX."""
 
         if self.options.no_exclude:
             return self.records
