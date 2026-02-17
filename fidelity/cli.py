@@ -24,11 +24,9 @@ class FidelityCLI(BaseCLI):
 
         self.ArgumentParser(
             prog=__package__,
-            description=self.dedent(
-                """
+            description=self.dedent("""
     Process downloaded Fidelity history files.
-                """
-            ),
+                """),
         )
 
     def add_arguments(self) -> None:
@@ -60,14 +58,12 @@ class FidelityCLI(BaseCLI):
 
         group = self.parser.add_argument_group(
             "Configuration File",
-            self.dedent(
-                """
+            self.dedent("""
     The configuration file defines these elements:
 
         `datafiles` (str):  Points to the `CSV` files to process. May
                             begin with `~`, and may contain wildcards.
-                """
-            ),
+                """),
         )
 
     def main(self) -> None:

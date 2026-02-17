@@ -5,6 +5,6 @@ lint :: mypy
 doc :: README.md
 
 # The following is for manual testing.
-FIDELITY := python -m fidelity --use-datafiles
+FIDELITY := pdm run python -m fidelity --use-datafiles
 report:
 	$(FIDELITY)
