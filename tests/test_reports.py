@@ -1,7 +1,5 @@
 """Tests for the Fidelity report generator."""
 
-# pylint: disable=protected-access
-
 import tempfile
 from argparse import Namespace
 from pathlib import Path

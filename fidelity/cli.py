@@ -71,12 +71,10 @@ class FidelityCLI(BaseCLI):
 
         # Read all `csv` files on the command line within the date range.
         fidelity = Fidelity(self.options)
-        #
         if self.options.use_datafiles and (datafiles := self.config.get("datafiles")):
             files = glob(str(Path(datafiles).expanduser()))
         else:
             files = self.options.FILES
-        #
         fidelity.read_input_files(files)
 
         fidelity.print_history_report()

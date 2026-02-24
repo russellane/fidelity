@@ -7,7 +7,6 @@ from fidelity.cli import main
 
 
 def test_main() -> None:
-
     def _main() -> None:
         run(["python", "-m", "fidelity", "--version"], check=True)
         sys.exit(0)

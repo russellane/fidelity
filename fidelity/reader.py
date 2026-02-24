@@ -11,8 +11,6 @@ __all__ = ["HistoryRecord", "read_history_file"]
 class HistoryRecord:
     """A single transaction record from Fidelity history export."""
 
-    # pylint: disable=too-many-instance-attributes
-
     run_date: str
     action: str
     symbol: str
@@ -41,7 +39,7 @@ class HistoryRecord:
 
         # Convert strings to floats.
         for f in fields(self):
-            if f.type == float:
+            if f.type is float:
                 value = getattr(self, f.name)
                 if isinstance(value, str):
                     try:

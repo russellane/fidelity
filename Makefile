@@ -1,6 +1,5 @@
 include Python.mk
 PROJECT = fidelity
-COV_FAIL_UNDER = 100
 lint :: mypy
 doc :: README.md
 
